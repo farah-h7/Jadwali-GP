@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083197466150",
+    "project_id": "jadwali2",
+    "storage_bucket": "jadwali2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083197466150:android:736e9e655d8d4ad162a8e7",
+        "android_client_info": {
+          "package_name": "com.example.jadwali_test_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMSaeBAkh0ESjtcgJwmoAzwOn4EKGzoCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
