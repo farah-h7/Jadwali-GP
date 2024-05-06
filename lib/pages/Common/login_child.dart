@@ -244,7 +244,7 @@ class _LoginChildState extends State<LoginChild> {
           currentChild = user;
 
           EasyLoading.dismiss();
-          context.goNamed(homeChild.routeName);
+          context.goNamed(HomeChild.routeName);
               //if user exist and is a parent
          
         } else {

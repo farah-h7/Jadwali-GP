@@ -77,7 +77,7 @@ final _router = GoRouter(
         String code = await AuthService.getcurrentusercode();
             
         currentChild = await childAuth().getChildWithSpecificUcode(code) as Child;
-        return homeChild.routeName;
+        return HomeChild.routeName;
                                           
       }
      }
@@ -114,9 +114,9 @@ final _router = GoRouter(
         ]
         ),
       GoRoute(
-      name: homeChild.routeName,
-      path:  homeChild.routeName,
-      builder: (context, state) =>  homeChild(user: currentChild!,),
+      name: HomeChild.routeName,
+      path:  HomeChild.routeName,
+      builder: (context, state) =>  HomeChild(user: currentChild!,),
     ),
         // GoRoute(
         //     name: LoginParent.routeName,

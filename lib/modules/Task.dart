@@ -31,6 +31,9 @@ class Task {
 
 //send map to db 
   Map <String, dynamic> toMap(){
+
+    String colorString = '0x${color.value.toRadixString(16).padLeft(8, '0')}'; // Convert to hexadecimal string
+    // print("Color to String: $colorString");
     return <String, dynamic>{
       //db,object
       taskId: id,
@@ -38,10 +41,11 @@ class Task {
       taskStartTime: Timestamp.fromDate(startTime),
       taskEndTime: Timestamp.fromDate(endTime),
       taskRepetition: repetition,
-      taskColor: color.toString(),
+      taskColor: colorString,
 
     };
   }
+
 
 //retrive map from db 
  factory Task.fromMap(Map<String, dynamic> map) {
@@ -50,7 +54,11 @@ class Task {
   Timestamp end = map[taskEndTime];
   String c = map[taskColor];
 
-  int colorValue = int.parse(c.replaceAll('0x', ''), radix: 16);
+
+  int colorInt = int.parse(c);
+  Color convertedColor = Color(colorInt);
+  
+ // Color ccc= stringToColor;   //int colorValue = int.parse(c.replaceAll('0x', ''), radix: 16);
 
   return Task(
           //object, dbTask
@@ -59,7 +67,8 @@ class Task {
           startTime: start.toDate(),
           endTime: end.toDate(),
           repetition: map[taskRepetition],
-          color:Color(colorValue),
+          color:convertedColor,
+          //color:Color(colorValue),
           
         );
  }

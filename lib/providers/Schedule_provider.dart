@@ -1,7 +1,6 @@
 
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jadwali_test_1/db/dbSchedule_helper.dart';
 import 'package:jadwali_test_1/modules/Task.dart';
@@ -9,6 +8,8 @@ import 'package:jadwali_test_1/modules/Task.dart';
 class ScheduleProvider with ChangeNotifier{
 
 List<Task> taskList = [];
+List<Task> tasksOfTheDayList = [];
+
 
 //add task to db
 Future<void> addTask(String name, DateTime startTime, DateTime endTime, String repetition, Color color, String scheduleid) async {
@@ -16,8 +17,8 @@ Future<void> addTask(String name, DateTime startTime, DateTime endTime, String r
    // Timestamp TSdob = Timestamp.fromDate(dob);
     
     final newTask = Task(name: name, startTime: startTime, endTime: endTime, repetition: repetition, color: color);
-    
-    return DbScheduleHelper.addTaskDb(newTask,scheduleid);
+    DbScheduleHelper.addTaskDb(newTask,scheduleid);
+    return notifyListeners();
   }
 
 //remove task from db 
@@ -36,6 +37,50 @@ getTasks(String schedule_id){
       notifyListeners();
 
   });
+}
+
+getTasksOfTheDay(String schedule_id){
+   DbScheduleHelper.getAllTasksDb(schedule_id).listen((snapshot) { 
+
+    taskList = List.generate(snapshot.docs.length, (index) => Task.fromMap(snapshot.docs[index].data()));
+    final List<String> weekDays = [
+    'الأحد',
+    'الاثنين',
+    'الثلاثاء',
+    'الأربعاء',
+    'الخميس',
+    'الجمعة',
+    'السبت',
+  ];
+
+  DateTime today = DateTime.now();
+
+  tasksOfTheDayList = taskList.where((task) {
+      // Check if the task repeats every day
+      if (task.repetition == 'كل يوم') {
+        return true;
+      }
+      // Check if the selected day matches any repetition day of the task
+      if (task.repetition.contains(weekDays[(today.weekday + 7) % 7])) {
+        return true;
+      }
+      return false;
+    }).toList();
+
+    tasksOfTheDayList.sort((a, b) {
+    int compareHour = a.startTime.hour.compareTo(b.startTime.hour);
+    if (compareHour == 0) { // if hours are equal, then compare minutes
+      return a.startTime.minute.compareTo(b.startTime.minute);
+    }
+    return compareHour;
+  });
+
+    notifyListeners();
+      });
+
+  
+
+
 }
 
 

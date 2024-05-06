@@ -1,14 +1,19 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:jadwali_test_1/modules/Task.dart';
+import 'package:jadwali_test_1/providers/Schedule_provider.dart';
 import 'dart:io';
 
+import 'package:provider/provider.dart';
+//late String globalSId;
 
 class AddTaskScreen extends StatelessWidget {
-  final Function(Task) onAddTask;
+  //final Function(Task) onAddTask;
+  final String scheduleID;
 
-  const AddTaskScreen({Key? key, required this.onAddTask}) : super(key: key);
+  const AddTaskScreen({super.key, required this.scheduleID});
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +21,20 @@ class AddTaskScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('إضافة مهمة'),
+          title: const Text('إضافة مهمة'),
           backgroundColor: const Color.fromRGBO(255, 249, 227, 100),
         ),
-        body: AddTaskForm(onAddTask: onAddTask),
+        body: AddTaskForm(scheduleID: scheduleID),
       ),
     );
   }
 }
 
 class AddTaskForm extends StatefulWidget {
-  final Function(Task) onAddTask;
+  //final Function(Task) onAddTask;
+  final String scheduleID;
 
-  const AddTaskForm({Key? key, required this.onAddTask}) : super(key: key);
+  const AddTaskForm({super.key, required this.scheduleID});
 
   @override
   _AddTaskFormState createState() => _AddTaskFormState();
@@ -38,7 +44,15 @@ class _AddTaskFormState extends State<AddTaskForm> {
   late TextEditingController _nameController;
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
-  List<String> _weekDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  final List<String> _weekDays = [
+    'الأحد',
+    'الاثنين',
+    'الثلاثاء',
+    'الأربعاء',
+    'الخميس',
+    'الجمعة',
+    'السبت'
+  ];
   late TextEditingController _repetitionController;
   Color _selectedColor = Colors.white;
   List<bool> _selectedRepetitionDays = List.filled(7, false);
@@ -64,34 +78,34 @@ class _AddTaskFormState extends State<AddTaskForm> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
-        padding: EdgeInsets.all(20),
-        child: ListView(
-          children:[ Column(
+        padding: const EdgeInsets.all(20),
+        child: ListView(children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
+              const Text(
                 'اضافة مهمة',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'اسم المهمة',
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
                     child: InkWell(
                       onTap: _selectStartTime,
                       child: InputDecorator(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'وقت بداية المهمة',
                           border: OutlineInputBorder(),
                         ),
@@ -101,18 +115,18 @@ class _AddTaskFormState extends State<AddTaskForm> {
                             Text(
                               _formatTimeOfDay(_selectedStartTime),
                             ),
-                            Icon(Icons.arrow_drop_down),
+                            const Icon(Icons.arrow_drop_down),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 15),
+                  const SizedBox(width: 15),
                   Expanded(
                     child: InkWell(
                       onTap: _selectEndTime,
                       child: InputDecorator(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'وقت نهاية المهمة',
                           border: OutlineInputBorder(),
                         ),
@@ -122,7 +136,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                             Text(
                               _formatTimeOfDay(_selectedEndTime),
                             ),
-                            Icon(Icons.arrow_drop_down),
+                            const Icon(Icons.arrow_drop_down),
                           ],
                         ),
                       ),
@@ -130,11 +144,11 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               InkWell(
                 onTap: _selectRepetition,
                 child: InputDecorator(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'تكرار المهمة',
                     border: OutlineInputBorder(),
                   ),
@@ -144,39 +158,39 @@ class _AddTaskFormState extends State<AddTaskForm> {
                       Text(
                         _getRepetition(),
                       ),
+                      const Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              InkWell(
+                onTap: _showColorPickerDialog,
+                child: const InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'اللون',
+                    border: OutlineInputBorder(),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'اللون',
+                      ),
                       Icon(Icons.arrow_drop_down),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 15),
-              InkWell(
-                  onTap: _showColorPickerDialog,
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'اللون',
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'اللون',
-                        ),
-                        Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
-                  ),
-                ),
               // ColorPicker(
               //   pickerColor: _selectedColor,
               //   onColorChanged: (color) => setState(() => _selectedColor = color),
               //   showLabel: true,
               //   pickerAreaHeightPercent: 0.8,
               // ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-              InkWell(
+              const InkWell(
                 onTap: _pickImage,
                 child: InputDecorator(
                   decoration: InputDecoration(
@@ -195,10 +209,10 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 ),
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               ElevatedButton(
-                onPressed: _addTask,
-                child: Text('أضف'),
+                onPressed: () => _addTask(widget.scheduleID),
+                child: const Text('أضف'),
               ),
             ],
           ),
@@ -207,6 +221,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
+/////////////////////////mehtods ///////////////////////////////////////////////////////////////
   void _selectStartTime() async {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
@@ -241,33 +256,33 @@ class _AddTaskFormState extends State<AddTaskForm> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: Text('اختر أيام التكرار'),
+            title: const Text('اختر أيام التكرار'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(
                 _weekDays.length,
                 (index) => StatefulBuilder(
-                builder: (context, setState) {
-                  return CheckboxListTile(
-                    title: Text(_weekDays[index]),
-                    value: selectedDays[index],
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedDays[index] = value!;
-                      });
+                  builder: (context, setState) {
+                    return CheckboxListTile(
+                      title: Text(_weekDays[index]),
+                      value: selectedDays[index],
+                      onChanged: (bool? value) {
+                        setState(() {
+                          selectedDays[index] = value!;
+                        });
+                      },
+                      activeColor: activeColor,
+                    );
                   },
-                  activeColor: activeColor,
-                );
-                },
+                ),
               ),
-            ),
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('الغاء'),
+                child: const Text('الغاء'),
               ),
               TextButton(
                 onPressed: () {
@@ -276,7 +291,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   });
                   Navigator.of(context).pop();
                 },
-                child: Text('تم'),
+                child: const Text('تم'),
               ),
             ],
           ),
@@ -307,7 +322,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
     return '$hour:$minute';
   }
 
-
   void _showColorPickerDialog() {
     showDialog(
       context: context,
@@ -315,11 +329,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: Text('اختر اللون'),
+            title: const Text('اختر اللون'),
             content: SingleChildScrollView(
               child: ColorPicker(
                 pickerColor: _selectedColor,
-                onColorChanged: (color) => setState(() => _selectedColor = color),
+                onColorChanged: (color) =>
+                    setState(() => _selectedColor = color),
                 showLabel: true,
                 pickerAreaHeightPercent: 0.8,
               ),
@@ -329,7 +344,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('تم'),
+                child: const Text('تم'),
               ),
             ],
           ),
@@ -338,9 +353,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-
-
-  void _addTask() {
+  void _addTask(String sID) {
     final String name = _nameController.text.trim();
     final DateTime startTime = DateTime(
       DateTime.now().year,
@@ -364,25 +377,18 @@ class _AddTaskFormState extends State<AddTaskForm> {
     }
     final Color color = _selectedColor;
 
-    final newTask = Task(
-      name: name,
-      startTime: startTime,
-      endTime: endTime,
-      repetition: selectedRepetitionDays.join(', '), // Adjust as needed
-      color: color,
-    );
-
-    widget.onAddTask(newTask);
-    Navigator.of(context).pop(); // Close the Add Task screen after adding the task
+    Provider.of<ScheduleProvider>(context, listen: false).addTask(name,
+        startTime, endTime, selectedRepetitionDays.join(', '), color, sID);
+    Navigator.of(context)
+        .pop(); // Close the Add Task screen after adding the task
   }
 }
 
-
-
-
 Future<void> _pickImage() async {
   final ImagePicker _picker = ImagePicker();
-  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery); // Allows the user to pick an image from the gallery
+  final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource
+          .gallery); // Allows the user to pick an image from the gallery
 
   if (pickedFile != null) {
     // Handle the picked image here
@@ -391,14 +397,12 @@ Future<void> _pickImage() async {
   }
 }
 
-
-
-
 class ColorCircle extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const ColorCircle({Key? key, required this.color, required this.onTap}) : super(key: key);
+  const ColorCircle({Key? key, required this.color, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -415,5 +419,3 @@ class ColorCircle extends StatelessWidget {
     );
   }
 }
-
-

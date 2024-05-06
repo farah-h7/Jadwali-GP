@@ -325,7 +325,7 @@ class _CreateChildUserState extends State<CreateChildUser> {
           //retriving child profile 
           Child getchild = await childAuth().getChildWithSpecificUcode(ucode) as Child;
           currentChild = getchild;
-          context.goNamed(homeChild.routeName);
+          context.goNamed(HomeChild.routeName);
 
           EasyLoading.dismiss();
           

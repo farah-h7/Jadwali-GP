@@ -17,7 +17,7 @@ class HomeParent extends StatefulWidget {
 
 class _HomeParentState extends State<HomeParent> {
  // List<Child> children = [];
-  //calling getting all brands function to use in this page and any page down the tree
+  //calling getting all children function to use in this page and any page down the tree
   @override
   void didChangeDependencies(){
    // Provider.of<childProvider>(context, listen: false).getAllChildren();
@@ -86,7 +86,7 @@ class _HomeParentState extends State<HomeParent> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 ChildSchedulePage(
-                                                    child: child),
+                                                    childInfo: child),
                                           ),
                                         );
                                       },
