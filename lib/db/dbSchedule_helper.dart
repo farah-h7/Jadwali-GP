@@ -1,12 +1,14 @@
 
-
-// ignore_for_file: non_constant_identifier_names
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:jadwali_test_1/modules/Task.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
-final String collectionSchedule = "Schedules";
-final String collectionTasks = "Tasks";
+const String collectionSchedule = "Schedules";
+const String collectionTasks = "Tasks";
 
 class DbScheduleHelper {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -18,19 +20,34 @@ class DbScheduleHelper {
      return doc.id; 
   }
   
-  static Future<void> addTaskDb(Task newTask, String schedule_id) async {
+  static Future<void> addTaskDb(STask newTask, String schedule_id, File? TaskImage) async {
 
     final scheduleDocRef = _db.collection(collectionSchedule).doc(schedule_id);
     final tasksDocRef = scheduleDocRef.collection(collectionTasks).doc();// creating a subcollection tasks and adding a document to it 
     newTask.id = tasksDocRef.id;
+
+    //sending picture to firbase storage and retriving its url 
+    if (TaskImage != null) {
+    // Upload to Firebase Storage
+    try {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference ref = FirebaseStorage.instance.ref().child('uploads/$fileName');
+      UploadTask uploadTask = ref.putFile(TaskImage);
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      newTask.imageURL = downloadURL;
+
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
     return tasksDocRef.set(newTask.toMap());
   }
 
   static Future<void> deleteTaskDb(String task_id, String schedule_id) async {
 
-    final scheduleDocRef = _db.collection(collectionSchedule).doc(schedule_id);
-    final tasksDocRef = scheduleDocRef.collection(collectionTasks).doc(task_id);// creating a subcollection tasks and adding a document to it 
-    tasksDocRef.delete();
+    _db.collection(collectionSchedule).doc(schedule_id).collection(collectionTasks).doc(task_id).delete();
   }
 
 
@@ -44,6 +61,18 @@ class DbScheduleHelper {
 
   }
 
+
+
+static Future<File> getImageFile(String imageUrl, String id) async {
+  
+
+  final tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/$id.jpg';
+    final response = await http.get(Uri.parse(imageUrl));
+    final file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
+}
 
   //   static Stream<QuerySnapshot<Map<String, dynamic>>>
   //     getTasksOfTheDay(String schedule_id) {

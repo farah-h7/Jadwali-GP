@@ -42,6 +42,7 @@ class AddTaskForm extends StatefulWidget {
 
 class _AddTaskFormState extends State<AddTaskForm> {
   late TextEditingController _nameController;
+  File? _imageFileController = null;
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
   final List<String> _weekDays = [
@@ -190,20 +191,41 @@ class _AddTaskFormState extends State<AddTaskForm> {
               // ),
               const SizedBox(height: 15),
 
-              const InkWell(
-                onTap: _pickImage,
+              InkWell(
+                onTap: () async {
+                  _imageFileController = await _pickImage();
+                  setState(() {});
+                },
                 child: InputDecorator(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'صورة المهمة',
                     border: OutlineInputBorder(),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         'اضغط لاختيار صورة',
                       ),
-                      Icon(Icons.image_outlined),
+                      _imageFileController != null
+                          ? Row(children: [
+                              Image.file(
+                                _imageFileController!,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _imageFileController = null;
+                                  });
+                                },
+                              ),
+                            ])
+                          : const Icon(Icons.image_outlined),
+                      // const Icon(Icons.image_outlined),
                     ],
                   ),
                 ),
@@ -377,14 +399,20 @@ class _AddTaskFormState extends State<AddTaskForm> {
     }
     final Color color = _selectedColor;
 
-    Provider.of<ScheduleProvider>(context, listen: false).addTask(name,
-        startTime, endTime, selectedRepetitionDays.join(', '), color, sID);
+    Provider.of<ScheduleProvider>(context, listen: false).addTask(
+        name,
+        startTime,
+        endTime,
+        selectedRepetitionDays.join(', '),
+        color,
+        sID,
+        _imageFileController);
     Navigator.of(context)
         .pop(); // Close the Add Task screen after adding the task
   }
 }
 
-Future<void> _pickImage() async {
+Future<File?> _pickImage() async {
   final ImagePicker _picker = ImagePicker();
   final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource
@@ -392,10 +420,54 @@ Future<void> _pickImage() async {
 
   if (pickedFile != null) {
     // Handle the picked image here
-    File imageFile = File(pickedFile.path);
+    return File(pickedFile.path);
+
     // Perform further operations with the image file (e.g., display it or save it)
   }
+  return null;
 }
+
+
+/*add pick from tuqa
+Future<void> _pickImage(BuildContext context) async {
+  final ImagePicker _picker = ImagePicker();
+
+  // Show options to pick an image from the gallery or take a picture
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return SafeArea(
+        child: Container(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('اختر صورة من جهازك'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+                  _handleImage(context, pickedFile);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('التقط صورة'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                  _handleImage(context, pickedFile);
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+*/
+
 
 class ColorCircle extends StatelessWidget {
   final Color color;

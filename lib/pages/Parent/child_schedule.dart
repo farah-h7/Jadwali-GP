@@ -57,12 +57,12 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
     'السبت',
   ];
 
-  List<Task> selectedTasks = [];
-  List<Task> tasks = [];
+  List<STask> selectedTasks = [];
+  List<STask> tasks = [];
 
-  List<Task> _filterTasksForSelectedDay(DateTime selectedDay) {
+  List<STask> _filterTasksForSelectedDay(DateTime selectedDay) {
     tasks = Provider.of<ScheduleProvider>(context, listen: false).taskList;
-    List<Task> filteredTasks = tasks.where((task) {
+    List<STask> filteredTasks = tasks.where((task) {
       // Check if the task repeats every day
       if (task.repetition == 'كل يوم') {
         return true;

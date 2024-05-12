@@ -48,6 +48,8 @@ class childProvider with ChangeNotifier {
     DbHelper.getAllChildrenWithSpecificField().listen((snapshot) {
       childList = List.generate(snapshot.docs.length,
           (index) => Child.fromMap(snapshot.docs[index].data()));
+
+      
       notifyListeners();
     });
   }

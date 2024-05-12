@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jadwali_test_1/auth/auth_service.dart';
 import 'package:jadwali_test_1/main.dart';
+import 'package:jadwali_test_1/modules/Task.dart';
 import 'package:jadwali_test_1/modules/child.dart';
+import 'package:jadwali_test_1/pages/Child/connect_monitor.dart';
 import 'package:jadwali_test_1/pages/Child/profile.dart';
 import 'package:jadwali_test_1/pages/Child/task_page.dart';
 import 'package:jadwali_test_1/pages/Common/pre_login.dart';
@@ -113,6 +115,12 @@ class _HomeChildState extends State<HomeChild> {
                 ),
                 onTap: () {
                   // Navigate to the settings page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ConnectMonitor(),
+                    ),
+                  );
                 },
               ),
 
@@ -169,11 +177,25 @@ class _HomeChildState extends State<HomeChild> {
                         final task = provider.tasksOfTheDayList[index];
                         return ListTile(
                           //leading: tasks[index].isDone ? Icon(Icons.check, color: Colors.green) : null,
-                          title: Center(child: Text(task.name)), //Text(tasks[index].name),
-                          subtitle: Image.asset('assets/images/logo.png',
-                              /*tasks[index].imagePath*/
-                              width: 200,
-                              height: 200),
+                          title: Center(
+                              child:
+                                  Text(task.name)), //Text(tasks[index].name),
+                          subtitle: task.imageFile != null
+                              ? Image.file(
+                                  task.imageFile!,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset('assets/images/logo.png',
+                                  /*tasks[index].imagePath*/
+                                  width: 200,
+                                  height: 200),
+
+                          // Image.asset('assets/images/logo.png',
+                          //     /*tasks[index].imagePath*/
+                          //     width: 200,
+                          //     height: 200),
                           onTap: () {
                             // Navigate to task details page
                           },
@@ -194,16 +216,18 @@ class _HomeChildState extends State<HomeChild> {
                       iconSize: 100,
                       icon: const Icon(Icons.play_circle_rounded),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TaskDisplayPage(
-                                playTasks: Provider.of<ScheduleProvider>(
-                                        context,
-                                        listen: false)
-                                    .tasksOfTheDayList),
-                          ),
-                        );
+                        List<STask> TS = Provider.of<ScheduleProvider>(context,
+                                listen: false)
+                            .tasksOfTheDayList;
+                        if (TS.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TaskDisplayPage(playTasks: TS),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),

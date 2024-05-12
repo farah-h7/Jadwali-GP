@@ -11,6 +11,7 @@ import 'package:jadwali_test_1/pages/Common/login_child.dart';
 import 'package:jadwali_test_1/pages/Parent/home_parent.dart';
 import 'package:jadwali_test_1/pages/Common/login_parent.dart';
 import 'package:jadwali_test_1/pages/Common/pre_login.dart';
+import 'package:jadwali_test_1/providers/BLConn_provider.dart';
 import 'package:jadwali_test_1/providers/Schedule_provider.dart';
 import 'package:jadwali_test_1/providers/child_provider.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (context) => childProvider()),
       ChangeNotifierProvider(create: (context)=> ScheduleProvider()),
+      ChangeNotifierProvider(create: (context)=> BLConnProvider()),
     ],
     child: MyApp()));
 }
@@ -116,7 +118,7 @@ final _router = GoRouter(
       GoRoute(
       name: HomeChild.routeName,
       path:  HomeChild.routeName,
-      builder: (context, state) =>  HomeChild(user: currentChild!,),
+      builder: (context, state) =>  HomeChild(user: currentChild!),
     ),
         // GoRoute(
         //     name: LoginParent.routeName,
