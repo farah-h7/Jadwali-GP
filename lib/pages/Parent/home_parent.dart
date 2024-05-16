@@ -16,12 +16,12 @@ class HomeParent extends StatefulWidget {
 }
 
 class _HomeParentState extends State<HomeParent> {
- // List<Child> children = [];
+  // List<Child> children = [];
   //calling getting all children function to use in this page and any page down the tree
   @override
-  void didChangeDependencies(){
-   // Provider.of<childProvider>(context, listen: false).getAllChildren();
-   Provider.of<childProvider>(context, listen: false).getAllChildrenwithP();
+  void didChangeDependencies() {
+    // Provider.of<childProvider>(context, listen: false).getAllChildren();
+    Provider.of<childProvider>(context, listen: false).getAllChildrenwithP();
     super.didChangeDependencies();
   }
 
@@ -71,47 +71,56 @@ class _HomeParentState extends State<HomeParent> {
                         //         child: Text("لا يوجد أطفال"),
                         //       )
                         //     :
-                             ListView.builder(
-                                padding: const EdgeInsets.all(16.0),
-                                itemCount: provider.childList.length,
-                                itemBuilder: (context, index) {
-                                  final child = provider.childList[index];
-                                  return Card(
+                        ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: provider.childList.length,
+                      itemBuilder: (context, index) {
+                        final child = provider.childList[index];
+                        return Card(
                           elevation: 3, // Add elevation for a shadow effect
                           color: Colors.white,
                           child: GestureDetector(
                             onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ChildSchedulePage(
-                                                    childInfo: child),
-                                          ),
-                                        );
-                                      },
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChildSchedulePage(childInfo: child),
+                                ),
+                              );
+                            },
                             child: Container(
-                              
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15), // Adjust the border radius as needed
-                                border: Border.all(color: Colors.black, width: 1), // Add thin black border
-                                color: Colors.white, // Set background color to white
+                                borderRadius: BorderRadius.circular(
+                                    15), // Adjust the border radius as needed
+                                border: Border.all(
+                                    color: Colors.black,
+                                    width: 1), // Add thin black border
+                                color: Colors
+                                    .white, // Set background color to white
                               ),
                               height: 100, // Increase the height as needed
-                              padding: const EdgeInsets.all(10), // Add padding to the container
+                              padding: const EdgeInsets.all(
+                                  10), // Add padding to the container
                               child: Row(
                                 children: [
-                                const CircleAvatar(
-                                    radius: 40, // Adjust the radius of the profile icon
+                                  const CircleAvatar(
+                                    radius:
+                                        40, // Adjust the radius of the profile icon
                                     // Add your profile image here, you can use backgroundImage or child with Icon or Image
-                                    backgroundImage: AssetImage('assets/images/logo.png'),
+                                    backgroundImage:
+                                        AssetImage('assets/images/logo.png'),
                                     // child: Icon(Icons.person, size: 30), // Sample profile icon
                                   ),
-                                  const SizedBox(width: 10), // Add some space between the profile icon and text
+                                  const SizedBox(
+                                      width:
+                                          10), // Add some space between the profile icon and text
                                   Expanded(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           child.name,
@@ -120,7 +129,9 @@ class _HomeParentState extends State<HomeParent> {
                                             //fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        const SizedBox(height: 5), // Add some vertical space between name and other details
+                                        const SizedBox(
+                                            height:
+                                                5), // Add some vertical space between name and other details
                                         // Add more details if needed, like age, school, etc.
                                       ],
                                     ),
@@ -132,24 +143,23 @@ class _HomeParentState extends State<HomeParent> {
                                       setState(() {
                                         //children.removeAt(index);
                                       });
-                            
+
                                       // Show a snackbar to indicate item deletion
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         const SnackBar(
                                           content: Text("تم الحذف"),
                                         ),
                                       );
                                     },
                                   ),
-                                
                                 ],
                               ),
-                            
                             ),
                           ),
                         );
-                                },
-                              ),
+                      },
+                    ),
                   ),
                 ),
                 Padding(
@@ -160,7 +170,8 @@ class _HomeParentState extends State<HomeParent> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => addChildPage(),
-                        ),);
+                        ),
+                      );
                       // final newChild = await Navigator.push(
                       //   context,
                       //   MaterialPageRoute(

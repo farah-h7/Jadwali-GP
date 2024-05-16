@@ -44,6 +44,8 @@ class DbHelper {
     return snapshot.exists;
   }
 
+  
+
 // sends a child to firebase
   static Future<void> addChildDb(Child newchild) {
 //create a new document in a collection in firebase
@@ -56,7 +58,6 @@ class DbHelper {
 
     final doc2 = _db.collection("specialCodes").doc(newchild.ucode);
 
-
     Ucode newCode = Ucode(
         ucode: newchild.ucode,
         childProfileID: newchild.id,
@@ -66,36 +67,36 @@ class DbHelper {
     return doc.set(newchild.toMap());
   }
 
-
   static Future<bool> checkValidUcode(String ucode, String parentEmail) async {
-    //get ucode 
+    //get ucode
     final snapshot = await _db.collection("specialCodes").doc(ucode).get();
-    if(!snapshot.exists) {//id code does not exist 
-      return false;
-    }
-    
-    String? taken = snapshot.data()?["child ID"];
-    if(taken != null){
+    if (!snapshot.exists) {
+      //id code does not exist
       return false;
     }
 
-    String PID= snapshot.data()!['parent ID']; //get prent id from specialcode collection
-    final snapshot2 = await _db.collection("users").doc(PID).get(); // get email for parent with pid 
-    
-    if(snapshot2.data()!['email'] == parentEmail){// if email matched 
-    return true;
+    String? taken = snapshot.data()?["child ID"];
+    if (taken != null) {
+      return false;
     }
-    
+
+    String PID = snapshot
+        .data()!['parent ID']; //get prent id from specialcode collection
+    final snapshot2 = await _db
+        .collection("users")
+        .doc(PID)
+        .get(); // get email for parent with pid
+
+    if (snapshot2.data()!['email'] == parentEmail) {
+      // if email matched
+      return true;
+    }
+
     return false;
   }
 
-
-
-  static Future<void> updateUcode(String ucode, String childID)async {
-
-     _db.collection("specialCodes").doc(ucode).update({"child ID": childID});
-
-     
+  static Future<void> updateUcode(String ucode, String childID) async {
+    _db.collection("specialCodes").doc(ucode).update({"child ID": childID});
   }
 
 //add child user to user collection

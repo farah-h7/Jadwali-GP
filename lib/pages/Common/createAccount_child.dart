@@ -297,51 +297,44 @@ class _CreateChildUserState extends State<CreateChildUser> {
       final ucode = _ucodeController.text;
       final parentEmail = _ParentEmailController.text;
 
-
       // check ucode and and parent match
-      bool validUcode = await DbHelper.checkValidUcode(ucode , parentEmail);
-      if(!validUcode){// if ucode and parent email dont match 
+      bool validUcode = await DbHelper.checkValidUcode(ucode, parentEmail);
+      if (!validUcode) {  // if ucode and parent email dont match
         EasyLoading.dismiss();
         setState(() {
-          _errMsg = ' هناك خطأ في المعلومات المدخلة(رمز الطفل أو بريد ولي الأمر)';
+          _errMsg =
+              ' هناك خطأ في المعلومات المدخلة(رمز الطفل أو بريد ولي الأمر)';
         });
-      } else{
-         User? usern;
+      } else {
+        User? usern;
         try {
-          //creating child account 
-          UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email,
-            password: pass,
-          );
-          
-          // adding new child user in user collection 
+          //creating child account
+          UserCredential userCredential =
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass);
+          // adding new child user in user collection
           usern = userCredential.user;
-          user newuserchild = user(email: email, name: "name", accountType: "c", ucode: ucode);
+          user newuserchild =
+              user(email: email, name: "name", accountType: "c", ucode: ucode);
           DbHelper.addChilduserDb(newuserchild, usern!.uid);
-          
+
           //need to update ucode
           DbHelper.updateUcode(ucode, usern.uid);
 
-          //retriving child profile 
-          Child getchild = await childAuth().getChildWithSpecificUcode(ucode) as Child;
+          //retriving child profile
+          Child getchild =
+              await childAuth().getChildWithSpecificUcode(ucode) as Child;
           currentChild = getchild;
           context.goNamed(HomeChild.routeName);
 
           EasyLoading.dismiss();
-          
         } catch (error) {
           EasyLoading.dismiss();
           setState(() {
             _errMsg = error.toString();
-           // _errMsg = ' هناك خطأ في المعلومات المدخلة';
+            // _errMsg = ' هناك خطأ في المعلومات المدخلة';
           });
-
         }
       }
-
-
-
-      
     }
   }
 }

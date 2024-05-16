@@ -41,9 +41,16 @@ class ScheduleProvider with ChangeNotifier {
 //getall tasks
 
   getTasks(String schedule_id) {
-    DbScheduleHelper.getAllTasksDb(schedule_id).listen((snapshot) {
+    DbScheduleHelper.getAllTasksDb(schedule_id).listen((snapshot) async {
       taskList = List.generate(snapshot.docs.length,
           (index) => STask.fromMap(snapshot.docs[index].data()));
+
+      //     for (STask task in taskList) {
+      //   if (task.imageURL != null) {
+      //     String url = task.imageURL!;
+      //     task.imageFile = await DbScheduleHelper.getImageFile(url, task.id!);
+      //   }
+      // }
       notifyListeners();
     });
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jadwali_test_1/modules/child.dart';
+import 'package:jadwali_test_1/pages/Parent/child_reports.dart';
 import 'package:jadwali_test_1/pages/Parent/child_schedule.dart';
 import 'package:jadwali_test_1/pages/Parent/home_parent.dart';
 
@@ -8,7 +9,7 @@ class ChildInformationPage extends StatelessWidget {
   final Child child;
   //String stringDob = child.dob.toDate()
   const ChildInformationPage({super.key, required this.child});
-  
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -28,23 +29,18 @@ class ChildInformationPage extends StatelessWidget {
             textAlign: TextAlign.right,
           ),
           backgroundColor: const Color.fromRGBO(255, 249, 227, 100),
-
-          
         ),
-        body: Stack(
-          
-          children: [
-            Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/background.png"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+        body: Stack(children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/background.png"),
+                fit: BoxFit.cover,
               ),
-            
-            ListView(
-              children: [Center(
+            ),
+          ),
+          ListView(children: [
+            Center(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -61,7 +57,7 @@ class ChildInformationPage extends StatelessWidget {
                   ],
                 ),
               ),
-                      ),
+            ),
           ]),
         ]),
         bottomNavigationBar: Padding(
@@ -93,6 +89,12 @@ class ChildInformationPage extends StatelessWidget {
                   icon: const Icon(Icons.analytics_outlined),
                   onPressed: () {
                     // Navigate to page 2
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyChartPage(),
+                      ),
+                    );
                   },
                 ),
                 // IconButton(
@@ -127,9 +129,10 @@ class ChildInformationPage extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.person),
                   onPressed: () {
-                
+                    // Navigate to page 5
                   },
                 ),
+
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () {

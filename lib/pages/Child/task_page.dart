@@ -1,9 +1,14 @@
+// ignore_for_file: non_constant_identifier_names, must_be_immutable
+
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jadwali_test_1/modules/Task.dart';
 import 'package:jadwali_test_1/providers/BLConn_provider.dart';
+import 'package:jadwali_test_1/providers/Stress_provider.dart';
 import 'package:provider/provider.dart';
 
 List<STask> playTasksglobal = [];
@@ -16,6 +21,7 @@ String pulseData = "Waiting for heartbeat...";
 int threshold = 100; //  threshold for stress detection
 List<DateTime> exceedTimestamps = [];
 Timer? checkTimer;
+Timer? stressTimer;
 //int heartRate = 0;
 DateTime? lastTimeAboveThreshold;
 Duration aboveThresholdDuration = Duration.zero;
@@ -24,6 +30,11 @@ const int toleranceLimit = 10;
 Duration maxGap = const Duration(seconds: 15); // Adjust the max gap as needed
 
 StreamSubscription<Uint8List>? _dataSubscription;
+
+///variables for pop ups
+//bool isStressed = false; // Indicates if the child is stressed
+final audioPlayer = AudioPlayer();
+bool isButtonEnabled = false; // Initially disabled
 
 //connection!.input!.listen(onDataReceived)
 
@@ -37,7 +48,8 @@ class TaskDisplayPage extends StatefulWidget {
 }
 
 class _TaskDisplayPageState extends State<TaskDisplayPage> {
-  //methods
+  ///////////////////////////methods///////////////////////////
+
   void onDataReceived(Uint8List data) {
     // Accumulate data until delimiter is found
     for (int i = 0; i < data.length; i++) {
@@ -84,6 +96,7 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
   }
 
   void showStressDetectedPopup() {
+    //old
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -118,11 +131,20 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     _dataSubscription = null;
   }
 
+  void startTaskTimer() {
+    Timer(const Duration(seconds: 5 /*minutes: 2*/), () {
+      setState(() {
+        isButtonEnabled = true; // Enable the button after 2 minutes
+      });
+    });
+  }
+
   @override
   void dispose() {
     //what happens after closing the page
     stopListening();
     checkTimer?.cancel();
+    stressTimer?.cancel();
     super.dispose();
   }
 
@@ -130,9 +152,16 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
   void initState() {
     super.initState();
 
-    if (index == 0 && Provider.of<BLConnProvider>(context, listen: false).isConn) {
+    if (index == 0 &&
+        Provider.of<BLConnProvider>(context, listen: false).isConn) {
       startRecivingData();
     }
+    if (index == 0) {
+      startTaskTimer();
+    }
+
+    stressTimer = Timer.periodic(const Duration(minutes: 2),
+        (_) => showStressPopUp(context, "id", Timestamp.now()));
 
     checkTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => checkForStress());
@@ -159,30 +188,67 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
 
             // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              widget.playTasks[index].imageFile != null
-                  ? Image.file(
-                      widget.playTasks[index].imageFile!,
-                      width: 300,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.asset('assets/images/logo.png',
-                      /*tasks[index].imagePath*/
-                      width: 200,
-                      height: 200),
+              const SizedBox(
+                height: 40,
+              ),
+
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    widget.playTasks[index].name,
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
+                padding: const EdgeInsets.all(24.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.8),
+                        spreadRadius: 2,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      widget.playTasks[index].imageFile != null
+                          ? Image.file(
+                              widget.playTasks[index].imageFile!,
+                              width: 300,
+                              height: 300,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset('assets/images/logo.png',
+                              /*tasks[index].imagePath*/
+                              width: 200,
+                              height: 200),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            widget.playTasks[index].name,
+                            style: const TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await audioPlayer
+                              .play(AssetSource('audios/audio1.m4a'));
+                        },
+                        child: const Icon(
+                          Icons.volume_up_rounded,
+                          size: 50,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      )
+                    ],
                   ),
                 ),
               ),
-
               // if (task.audioPath != null) ...[
               //   // Display audio player if audio path is provided
               //   // Implement audio player widget here
@@ -193,18 +259,30 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
               const SizedBox(height: 50),
               IconButton(
                 iconSize: 100,
-                icon: const Icon(Icons.check_circle, color: Colors.green),
+                icon: Icon(Icons.check_circle,
+                    color: isButtonEnabled ? Colors.green : Colors.grey),
                 onPressed: () {
-                  // Check if there are more tasks
-                  if (index < widget.playTasks.length - 1) {
-                    // Move to the next task
-                    setState(() {
-                      index++;
-                    });
-                  } else {
-                    index = 0;
-                    // No more tasks, navigate back
-                    Navigator.pop(context);
+                  if (isButtonEnabled) {
+                    showCongratulationsPopUp(context);
+
+                    // Check if there are more tasks
+                    if (index < widget.playTasks.length - 1) {
+                      //showCongratulationsPopUp(context);
+                      // Move to the next task
+                      setState(() {
+                        index++;
+                        isButtonEnabled = false;
+                        Timer(const Duration(seconds: 3), () {
+                          startTaskTimer();
+                        });
+                      });
+                    } else {
+                      showCongratulationsPopUp(context);
+
+                      index = 0;
+                      // No more tasks, navigate back
+                      Navigator.pop(context);
+                    }
                   }
                 },
               ),
@@ -216,116 +294,125 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
   }
 }
 
-// import 'package:flutter/material.dart';
-// import 'package:jadwali_test_1/modules/Task.dart';
+void showStressPopUp(BuildContext context, String TaskID, Timestamp now) async {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Center(
+            child: Text(
+              'ما هو شعورك الآن ؟',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  await audioPlayer.play(AssetSource('audios/audio1.m4a'));
+                },
+                child: const Icon(
+                  Icons.volume_up_rounded,
+                  size: 50,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      print("Happy face tapped");
+                      // Handle happy response
+                      Provider.of<StressProvider>(context, listen: false)
+                          .recordStressResponse(false, now, TaskID);
+                      exceedTimestamps.clear();
+                      Navigator.of(context).pop();
 
-// List<STask> playTasksglobal = [];
+                      // Reset stress state
+                      // kan fe set state 3aleha
+                    },
+                    child: Ink.image(
+                      image: const AssetImage('assets/images/greenFace.png'),
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      print("Sad face tapped");
+                      // Handle sad response
+                      Provider.of<StressProvider>(context, listen: false)
+                          .recordStressResponse(true, now, TaskID);
+                      exceedTimestamps.clear();
 
-// class TaskDisplayPage extends StatelessWidget {
-//   late List<STask> playTasks = [];
+                      Navigator.of(context).pop();
+                      // Possibly take further actions for a stressed response
+                    },
+                    child: Ink.image(
+                      image: const AssetImage('assets/images/redFace.png'),
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
-//   TaskDisplayPage({super.key, required this.playTasks});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     playTasksglobal = playTasks;
-//     return Scaffold(
-//         body: TaskbyTask(
-//       task: playTasks.first,
-//     ));
-//   }
-// }
-
-// class TaskbyTask extends StatefulWidget {
-//   final STask task;
-
-//   const TaskbyTask({super.key, required this.task});
-
-//   @override
-//   _TaskbyTaskState createState() => _TaskbyTaskState();
-// }
-
-// class _TaskbyTaskState extends State<TaskbyTask> {
-//   //get playTasks => null;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Directionality(
-//       textDirection: TextDirection.rtl,
-//       child: Scaffold(
-//         body: Stack(children: [
-//           Container(
-//             decoration: const BoxDecoration(
-//               image: DecorationImage(
-//                 image: AssetImage("assets/images/background.png"),
-//                 fit: BoxFit.cover,
-//               ),
-//             ),
-//           ),
-//           Column(
-//             crossAxisAlignment:
-//                 CrossAxisAlignment.center, // Horizontal Alignment
-//             mainAxisAlignment: MainAxisAlignment.center, // Vertical Alignment
-
-//             // crossAxisAlignment: CrossAxisAlignment.stretch,
-//             children: [
-//               widget.task.imageFile != null
-//                   ? Image.file(
-//                       widget.task.imageFile!,
-//                       width: 300,
-//                       height: 300,
-//                       fit: BoxFit.cover,
-//                     )
-//                   : Image.asset('assets/images/logo.png',
-//                       /*tasks[index].imagePath*/
-//                       width: 200,
-//                       height: 200),
-//               Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: Center(
-//                   child: Text(
-//                     widget.task.name,
-//                     style: const TextStyle(
-//                       fontSize: 36,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-
-//               // if (task.audioPath != null) ...[
-//               //   // Display audio player if audio path is provided
-//               //   // Implement audio player widget here
-//               //   // Placeholder for now
-//               //   SizedBox(height: 20),
-//               //   Center(child: Text('Audio Player Placeholder')),
-//               // ],
-//               const SizedBox(height: 50),
-//               IconButton(
-//                 iconSize: 100,
-//                 icon: const Icon(Icons.check_circle, color: Colors.green),
-//                 onPressed: () {
-//                   // Check if there are more tasks
-//                   if (playTasksglobal.indexOf(widget.task) <
-//                       playTasksglobal.length - 1) {
-//                     // Move to the next task
-//                     STask nextTask = playTasksglobal[
-//                         playTasksglobal.indexOf(widget.task) + 1];
-//                     Navigator.pushReplacement(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => TaskbyTask(task: nextTask),
-//                       ),
-//                     );
-//                   } else {
-//                     // No more tasks, navigate back
-//                     Navigator.pop(context);
-//                   }
-//                 },
-//               ),
-//             ],
-//           ),
-//         ]),
-//       ),
-//     );
-//   }
-// }
+void showCongratulationsPopUp(BuildContext context) {
+  audioPlayer.play(AssetSource('audios/audio2.m4a'));
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: MediaQuery.of(context).size.height * 0.4,
+          child: Stack(
+            children: [
+              Image.asset(
+                'assets/images/good-job.gif',
+                width: 300,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              //   Positioned.fill(
+              //     child: Align(
+              //       alignment: Alignment.bottomCenter,
+              //       child: IconButton(
+              //         iconSize: 100,
+              //         icon: const Icon(Icons.check_circle, color: Colors.green),
+              //         onPressed: () {
+              //           Navigator.pop(context);
+              //         },
+              //       ),
+              //     ),
+              //   )
+            ],
+          ),
+        ),
+      );
+    },
+  );
+  Timer(const Duration(seconds: 3), () {
+    //Navigator.of(context).pop();
+    Navigator.pop(context);
+    audioPlayer.stop();
+  });
+}

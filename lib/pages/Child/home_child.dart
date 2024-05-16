@@ -168,40 +168,60 @@ class _HomeChildState extends State<HomeChild> {
                   ),
                 ),
                 // Display tasks with images and green check if done
-                Expanded(
+                 Expanded(
                   child: Consumer<ScheduleProvider>(
                       builder: (context, provider, child) {
                     return ListView.builder(
                       itemCount: provider.tasksOfTheDayList.length,
                       itemBuilder: (context, index) {
                         final task = provider.tasksOfTheDayList[index];
-                        return ListTile(
-                          //leading: tasks[index].isDone ? Icon(Icons.check, color: Colors.green) : null,
-                          title: Center(
-                              child:
-                                  Text(task.name)), //Text(tasks[index].name),
-                          subtitle: task.imageFile != null
-                              ? Image.file(
-                                  task.imageFile!,
-                                  width: 300,
-                                  height: 300,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset('assets/images/logo.png',
-                                  /*tasks[index].imagePath*/
-                                  width: 200,
-                                  height: 200),
-
-                          // Image.asset('assets/images/logo.png',
-                          //     /*tasks[index].imagePath*/
-                          //     width: 200,
-                          //     height: 200),
-                          onTap: () {
-                            // Navigate to task details page
-                          },
-                          // trailing: tasks[index].isDone
-                          //     ? const Icon(Icons.check, color: Colors.green)
-                          //     : null,
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              //leading: tasks[index].isDone ? Icon(Icons.check, color: Colors.green) : null,
+                              title: Center(
+                                  child:
+                                      Text(task.name,
+                                      style: const TextStyle(
+                                        fontSize: 30
+                                      ),),
+                                      ), //Text(tasks[index].name),
+                              subtitle: task.imageFile != null
+                                  ?  Image.file(
+                                        task.imageFile!,
+                                        width: 300,
+                                        height: 300,
+                                        fit: BoxFit.cover,
+                                      
+                                  )
+                                  : Image.asset('assets/images/logo.png',
+                                      /*tasks[index].imagePath*/
+                                      width: 200,
+                                      height: 200),
+                            
+                              // Image.asset('assets/images/logo.png',
+                              //     /*tasks[index].imagePath*/
+                              //     width: 200,
+                              //     height: 200),
+                              
+                              // trailing: tasks[index].isDone
+                              //     ? const Icon(Icons.check, color: Colors.green)
+                              //     : null,
+                            ),
+                          ),
                         );
                       },
                     );

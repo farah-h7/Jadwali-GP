@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
@@ -13,13 +12,13 @@ const String childGender = 'gender';
 const String childUcode = 'ucode';
 const String childBraceletId = 'braceletid';
 const String childThreshold = 'threshold';
-const String childScheduleId ='schedule_id';
-//DateTime newChildDob = DateTime.now(); 
-
+const String childScheduleId = 'schedule_id';
+//DateTime newChildDob = DateTime.now();
 
 class Child {
   String? id;
   final String name;
+
   ///* final */DateTime? dob;
   //String? dob;
   Timestamp? dob;
@@ -45,10 +44,6 @@ class Child {
     return 100;
   }
 
- 
-
-
-
 //constructor
   Child({
     this.id,
@@ -57,16 +52,13 @@ class Child {
     this.dob,
     required this.gender,
     required this.ucode,
-    required this.scheduleID, 
-  
+    required this.scheduleID,
   }) {
     dtDob = dob!.toDate();
     sDob = DateFormat('yyyy-MM-dd').format(dtDob);
     age = calculateAge(dtDob);
     threshold = calculateThreshold(age);
-   
   }
-
 
 // to map information to database
   Map<String, dynamic> toMap() {
@@ -86,7 +78,7 @@ class Child {
 
 // to retrieve map from database
   factory Child.fromMap(Map<String, dynamic> map) => Child(
-        id: map[childId], 
+        id: map[childId],
         parentID: map[childParentId],
         name: map[childName],
         dob: map[childDob],
@@ -95,9 +87,6 @@ class Child {
         scheduleID: map[childScheduleId],
         //age: map[childAge],
       ); //return a child object
-
-
 }
-
 
 //List<ChildModel> childList = [];

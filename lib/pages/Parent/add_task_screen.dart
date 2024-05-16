@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jadwali_test_1/pages/Parent/record_audio.dart';
 import 'package:jadwali_test_1/providers/Schedule_provider.dart';
 import 'dart:io';
 
@@ -43,6 +44,7 @@ class AddTaskForm extends StatefulWidget {
 class _AddTaskFormState extends State<AddTaskForm> {
   late TextEditingController _nameController;
   File? _imageFileController = null;
+  String? _filePathController;// local path 
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
   final List<String> _weekDays = [
@@ -230,6 +232,38 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   ),
                 ),
               ),
+/////////////////////////////////////audio/////////////////
+const SizedBox(height: 15),
+
+              InkWell(
+                onTap: () async {
+                  _filePathController = await  Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AudioPage(),
+                                ),
+                              );
+                  setState(() {});
+                },
+                child: const InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'تسجيل صوتي',
+                    border: OutlineInputBorder(),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'اضغط لتسجيل الصوت',
+                      ),
+                      Icon(Icons.mic),
+                      // const Icon(Icons.image_outlined),
+                    ],
+                  ),
+                ),
+              ),
+////////////////////////
 
               const SizedBox(height: 15),
               ElevatedButton(

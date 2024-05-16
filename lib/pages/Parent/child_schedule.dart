@@ -1,8 +1,8 @@
-
 import 'package:jadwali_test_1/modules/child.dart';
 import 'package:flutter/material.dart';
 import 'package:jadwali_test_1/pages/Parent/add_task_screen.dart';
 import 'package:jadwali_test_1/pages/Parent/child_info.dart';
+import 'package:jadwali_test_1/pages/Parent/child_reports.dart';
 import 'package:jadwali_test_1/providers/Schedule_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -67,7 +67,7 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
       if (task.repetition == 'كل يوم') {
         return true;
       }
-      
+
       // Check if the selected day matches any repetition day of the task
       if (task.repetition.contains(_weekDays[(selectedDay.weekday + 7) % 7])) {
         return true;
@@ -78,13 +78,13 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
     setState(() {
       selectedTasks = filteredTasks;
       selectedTasks.sort((a, b) {
-    int compareHour = a.startTime.hour.compareTo(b.startTime.hour);
-    if (compareHour == 0) { // if hours are equal, then compare minutes
-      return a.startTime.minute.compareTo(b.startTime.minute);
-    }
-    return compareHour;
-  });
-      
+        int compareHour = a.startTime.hour.compareTo(b.startTime.hour);
+        if (compareHour == 0) {
+          // if hours are equal, then compare minutes
+          return a.startTime.minute.compareTo(b.startTime.minute);
+        }
+        return compareHour;
+      });
     });
 
     return filteredTasks;
@@ -166,6 +166,21 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
                     margin: const EdgeInsets.all(8),
                     color: selectedTasks[index].color,
                     child: ListTile(
+                       leading: 
+                       //selectedTasks[index].imageFile != null
+                      //     ? Image.file(
+                      //         selectedTasks[index].imageFile!,
+
+                      //         width: 100,
+                      //         height: 100,
+                      //         fit: BoxFit.cover,
+                      //         errorBuilder: (context, error, stackTrace) {
+                      //         // This will show an error icon if the image fails to load
+                      //         return const Icon(Icons.error);
+                      //         }
+                      //       )
+                      //     : 
+                      const Icon(Icons.image_outlined),
                       title: Text(selectedTasks[index].name),
                       // subtitle: Column(
                       //   crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,14 +190,23 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
                       //     // Text('Repetition: ${tasks[index].repetition}'),
                       //   ],
                       // ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            Provider.of<ScheduleProvider>(context, listen: false).deleteTask(selectedTasks[index].id!, widget.childInfo.scheduleID);
-                        
-                          });
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                              '${selectedTasks[index].startTime.hour.toString().padLeft(2, '0')}:${selectedTasks[index].startTime.minute.toString().padLeft(2, '0')}'), // Display start time
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                Provider.of<ScheduleProvider>(context,
+                                        listen: false)
+                                    .deleteTask(selectedTasks[index].id!,
+                                        widget.childInfo.scheduleID);
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -221,6 +245,12 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
                   icon: const Icon(Icons.analytics_outlined),
                   onPressed: () {
                     // Navigate to page 2
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyChartPage(),
+                      ),
+                    );
                   },
                 ),
                 // IconButton(

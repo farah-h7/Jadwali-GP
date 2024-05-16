@@ -55,6 +55,11 @@ dependencies:
   permission_handler: ^11.3.1
   device_info_plus: ^10.1.0
   shared_preferences:
+  audioplayers:
+  record: 
+  just_audio:
+  path_provider: 
+  fl_chart:
 
 
 dev_dependencies:
@@ -82,6 +87,13 @@ flutter:
      - assets/images/logo5.png
      - assets/images/background.png
      - assets/images/background2.png
+     - assets/images/greenFace.png
+     - assets/images/redFace.png
+     - assets/audios/audio1.m4a
+     - assets/images/reward.gif
+     - assets/audios/audio2.m4a
+     - assets/images/good-job.gif
+     - assets/images/background3.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
