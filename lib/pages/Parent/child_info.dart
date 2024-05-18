@@ -51,7 +51,7 @@ class ChildInformationPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     _buildInfoBox('العمر', '${child.age}'),
                     const SizedBox(height: 20),
-                    _buildInfoBox('الجنس', child.gender),
+                    _buildInfoBox('الجنس', child.gender == "Female"? "أنثى" : "ذكر"),
                     const SizedBox(height: 20),
                     _buildInfoBox('الرمز الخاص', child.ucode!),
                   ],

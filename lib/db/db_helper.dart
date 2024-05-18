@@ -67,6 +67,8 @@ class DbHelper {
     return doc.set(newchild.toMap());
   }
 
+  
+
   static Future<bool> checkValidUcode(String ucode, String parentEmail) async {
     //get ucode
     final snapshot = await _db.collection("specialCodes").doc(ucode).get();
@@ -106,6 +108,15 @@ class DbHelper {
     final doc2 = _db.collection("users").doc(userid);
 
     return doc2.set(newchilduser.toMap());
+  }
+
+  //add parent user to user collection
+  static Future<void> addParentuserDb(user newParentUser, String userid) {
+//create a new document in a collection in firebase
+
+    final doc2 = _db.collection("users").doc(userid );
+
+    return doc2.set(newParentUser.toMap());
   }
 
 //retrive all children

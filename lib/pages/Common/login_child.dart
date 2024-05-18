@@ -118,7 +118,7 @@ class _LoginChildState extends State<LoginChild> {
                           decoration: const InputDecoration(
                             filled: true,
                             prefixIcon: Icon(Icons.password),
-                            labelText: 'الرمز السري (at least 6 characters)',
+                            labelText: 'الرمز السري',
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -207,7 +207,9 @@ class _LoginChildState extends State<LoginChild> {
                     context.goNamed(
                         PreLogin.routeName); // .then: ino sho ye3mal after logout
                   },
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_circle_right_outlined,
+                  size: 60,
+                  color: Color.fromARGB(255, 148, 148, 148),),
                                 )
                               ]),
                 ]),

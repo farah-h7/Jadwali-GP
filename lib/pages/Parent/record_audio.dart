@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:jadwali_test_1/pages/Child/task_page.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 
-
 class AudioPage extends StatefulWidget {
+  final Function(File?) audioFile;
   @override
   _AudioPageState createState() => _AudioPageState();
+
+  AudioPage({super.key, required this.audioFile});
 }
 
 class _AudioPageState extends State<AudioPage> {
@@ -132,6 +137,32 @@ class _AudioPageState extends State<AudioPage> {
                 });
                 _audioPlayer.seek(Duration(seconds: value.toInt()));
               },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _filePath != null;
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 238, 72, 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
+              child: const Text('Delete'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (_filePath != null) {
+                  widget.audioFile(File(_filePath!));
+                }
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
+              child: const Text('save'),
             ),
           ],
         ),

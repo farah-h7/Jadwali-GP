@@ -24,6 +24,10 @@ class STask {
   final Color color;
   String? imageURL;// image will be a URL, get from firestore
   File? imageFile;
+  String? audioURL;
+  File? audioFile;
+  String? localAudioPath;
+
 
   STask({
     this.id,
@@ -34,6 +38,8 @@ class STask {
     required this.color,
     this.imageURL,
     this.imageFile,
+    this.audioURL,
+    this.audioFile,
   });
  
 //send map to db 
@@ -50,6 +56,7 @@ class STask {
       taskRepetition: repetition,
       taskColor: colorString,
       taskPicture: imageURL,
+      taskAudio: audioURL
 
     };
   }
@@ -79,6 +86,7 @@ class STask {
           repetition: map[taskRepetition],
           color:convertedColor,
           imageURL: map[taskPicture],
+          audioURL: map[taskAudio],
           //imageFile: await DbScheduleHelper.getImageFile(ImagePath);,          
         );
  }

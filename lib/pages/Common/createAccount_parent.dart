@@ -3,22 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jadwali_test_1/auth/auth_service.dart';
-import 'package:jadwali_test_1/pages/Common/createAccount_parent.dart';
-import 'package:jadwali_test_1/pages/Parent/home_parent.dart';
+import 'package:jadwali_test_1/db/db_helper.dart';
+import 'package:jadwali_test_1/modules/users.dart';
+import 'package:jadwali_test_1/pages/Common/login_parent.dart';
 import 'package:jadwali_test_1/pages/Common/pre_login.dart';
+import 'package:jadwali_test_1/pages/Parent/home_parent.dart';
 
-class LoginParent extends StatefulWidget {
-  static const String routeName = 'login_parent';
-  const LoginParent({super.key});
+class CreateAccountParent extends StatefulWidget {
+  static const String routeName = 'createAccount_parent';
+  const CreateAccountParent({super.key});
 
   @override
-  State<LoginParent> createState() => _LoginParentState();
+  State<CreateAccountParent> createState() => _CreateAccountParentState();
 }
 
-class _LoginParentState extends State<LoginParent> {
+class _CreateAccountParentState extends State<CreateAccountParent> {
   final _formKey = GlobalKey<FormState>();
+
+  final _parentNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _repasswordController = TextEditingController();
   String _errMsg = ''; // this will be managed bire firebase authentication
 
   @override
@@ -63,22 +68,42 @@ class _LoginParentState extends State<LoginParent> {
                     fontSize: 25,
                   ),
                                 ),
-                                // Image.asset(
-                                //     'assets/logo.png',
-                                //     width: 200,
-                                //     height: 200,
-                                //   ),
+                                
                                 Form(
                   key: _formKey,
                   child: ListView(
                     padding: const EdgeInsets.all(24.0),
                     shrinkWrap: true,
                     children: [
-                      //email text box
-                      Padding(
+                        Padding( //name entry textbox
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
-                          //textAlign: TextAlign.right,
+                          controller: _parentNameController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            prefixIcon: Icon(Icons.account_circle_rounded),
+                            labelText: ' الإسم',
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return ' الرجاء إدخال الإسم';
+                            }
+                            return null;
+                          },
+                         ),
+                         ),
+                     
+                      Padding(//email text box
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
                           controller: _emailController,
                           decoration: const InputDecoration(
@@ -101,12 +126,10 @@ class _LoginParentState extends State<LoginParent> {
                             return null;
                           },
                         ),
-                      ),
-                      //password textbox
-                      Padding(
+                      ),              
+                      Padding( //password textbox
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
-                          //textAlign: TextAlign.right,
                           obscureText: true, // to hide password
                           controller: _passwordController,
                           decoration: const InputDecoration(
@@ -130,29 +153,60 @@ class _LoginParentState extends State<LoginParent> {
                           },
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
+
+                       Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              obscureText: true,
+                              controller: _repasswordController,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                prefixIcon: Icon(Icons.password),
+                                labelText: 'تأكيد الرمز السري',
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'الرجاء إدخال الرمز السري مجددا';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'الرموز السرية غير متطابقة';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+
+                     Padding(
+                       padding: const EdgeInsets.only(top: 20.0),
                         child: ElevatedButton(
+                          //onPressed: _submitForm,
                           onPressed: _authenticate,
                           style: const ButtonStyle(
                             backgroundColor: MaterialStatePropertyAll(
                                 Color.fromARGB(96, 80, 80, 80)),
                           ),
                           child: const Text(
-                            'تسجيل الدخول',
+                             'إنشاء حساب',
                             style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),
-                      //text widget to show error
-                      
+                     ),
+                     // text widget to show error
                       Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: Text(
-                          _errMsg,
+                         _errMsg,
                           style: const TextStyle(
                             fontSize: 18,
                             color: Color.fromARGB(255, 244, 130, 54),
@@ -167,7 +221,7 @@ class _LoginParentState extends State<LoginParent> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                'ليس لديك حساب ؟',
+                                ' لديك حساب ؟',
                                 style: TextStyle(
                                   color: Color.fromARGB(255, 80, 80, 80),
                                   fontSize: 20,
@@ -177,10 +231,13 @@ class _LoginParentState extends State<LoginParent> {
                               ),
                               TextButton(
                                   onPressed: () {
-                                    context.goNamed(CreateAccountParent.routeName);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const LoginParent()),
+                                    );
                                   },
                                   child: const Text(
-                                    ' انشاء حساب',
+                                    'تسجيل الدخول',
                                     style: TextStyle(
                                       color: Colors.blue,
                                       fontSize: 20,
@@ -194,19 +251,14 @@ class _LoginParentState extends State<LoginParent> {
                       ),
                     ],
                   ),
-                                ),
-                                //back button
-
-                                IconButton(
+                ),                      
+                 IconButton(//back button
                   onPressed: () {
                     context.goNamed(
-                        PreLogin.routeName); // .then: ino sho ye3mal after logout
+                        PreLogin.routeName); 
                   },
-                  icon: const Icon(Icons.arrow_circle_right_outlined,
-                  size: 60,
-                  color: Color.fromARGB(255, 148, 148, 148),),
+                  icon: const Icon(Icons.arrow_back),
                                 )
-        
                               ]),
                 ]),
           ),
@@ -214,12 +266,24 @@ class _LoginParentState extends State<LoginParent> {
       ),
     );
   }
+  
+   void _submitForm() {
+    if (_formKey.currentState?.validate() ?? false) {
+      // Form is valid, proceed with the sign-up process
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Form is valid, processing data...')),
+      );
+      // Implement your sign-up logic here
+    }
+  }
 
 //////////////methods////////////////////
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _parentNameController.dispose();
+    _repasswordController.dispose();
 
     super.dispose();
   } //dispose
@@ -231,27 +295,29 @@ class _LoginParentState extends State<LoginParent> {
       //retrive email and pass from textfield
       final email = _emailController.text;
       final pass = _passwordController.text;
+      final name = _parentNameController.text;
+    User? usern; 
       try {
-        final status = await AuthService.loginP(email,
-            pass); // loginp is a future method so need to use await with it
-        EasyLoading.dismiss();
-        if (status) {
-          //if user exist and is a parent
-          context.goNamed(HomeParent.routeName);
-        } else {
-          await AuthService.logout();
-          setState(() {
-            _errMsg = "this is not a parent account";
-          });
-        }
+
+           UserCredential userCredential =
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass);
+          // adding new child user in user collection
+          usern = userCredential.user;
+          user newuserparent =
+              user(email: email, name: name , accountType: "p");
+          DbHelper.addParentuserDb(newuserparent, usern!.uid);
+
+        context.goNamed(HomeParent.routeName);
+
+          EasyLoading.dismiss();
       } on FirebaseAuthException catch (error) {
         //  use a firebase exception class
         EasyLoading.dismiss();
         setState(() {
-          _errMsg = error.message!;
+          _errMsg = error.toString();
           _errMsg = ' هناك خطأ في المعلومات المدخلة';
         });
       }
     }
   }
-}
+ }

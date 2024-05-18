@@ -7,6 +7,7 @@ import 'package:jadwali_test_1/db/db_helper.dart';
 import 'package:jadwali_test_1/modules/child.dart';
 import 'package:jadwali_test_1/pages/Common/createAccount_child.dart';
 import 'package:jadwali_test_1/pages/Child/home_child.dart';
+import 'package:jadwali_test_1/pages/Common/createAccount_parent.dart';
 import 'package:jadwali_test_1/pages/Common/login_child.dart';
 import 'package:jadwali_test_1/pages/Parent/home_parent.dart';
 import 'package:jadwali_test_1/pages/Common/login_parent.dart';
@@ -96,6 +97,13 @@ class MyApp extends StatelessWidget {
               name: LoginParent.routeName,
               path: LoginParent.routeName,
               builder: (context, state) => const LoginParent(),
+               routes: [
+                  GoRoute(
+                    name: CreateAccountParent.routeName,
+                    path: CreateAccountParent.routeName,
+                    builder: (context, state) => const CreateAccountParent(),
+                  ),
+                ]
             ),
             GoRoute(
                 name: LoginChild.routeName,

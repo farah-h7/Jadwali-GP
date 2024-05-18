@@ -44,7 +44,8 @@ class AddTaskForm extends StatefulWidget {
 class _AddTaskFormState extends State<AddTaskForm> {
   late TextEditingController _nameController;
   File? _imageFileController = null;
-  String? _filePathController;// local path 
+  File? _audioFileController = null;
+  String? _filePathController; // local path
   late TimeOfDay _selectedStartTime;
   late TimeOfDay _selectedEndTime;
   final List<String> _weekDays = [
@@ -233,31 +234,45 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 ),
               ),
 /////////////////////////////////////audio/////////////////
-const SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               InkWell(
                 onTap: () async {
-                  _filePathController = await  Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      AudioPage(),
-                                ),
-                              );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AudioPage(
+                        audioFile: saveAudioFile,
+                      ),
+                    ),
+                  );
                   setState(() {});
                 },
-                child: const InputDecorator(
-                  decoration: InputDecoration(
+                child: InputDecorator(
+                  decoration: const InputDecoration(
                     labelText: 'تسجيل صوتي',
                     border: OutlineInputBorder(),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         'اضغط لتسجيل الصوت',
                       ),
-                      Icon(Icons.mic),
+                      _audioFileController == null
+                          ? const Icon(Icons.mic)
+                          : Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _audioFileController = null;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.delete)),
+                                const Icon(Icons.audio_file_rounded)
+                              ],
+                            ),
                       // const Icon(Icons.image_outlined),
                     ],
                   ),
@@ -278,6 +293,12 @@ const SizedBox(height: 15),
   }
 
 /////////////////////////mehtods ///////////////////////////////////////////////////////////////
+  void saveAudioFile(File? a) {
+    setState(() {
+      _audioFileController = a;
+    });
+  }
+
   void _selectStartTime() async {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
@@ -440,7 +461,7 @@ const SizedBox(height: 15),
         selectedRepetitionDays.join(', '),
         color,
         sID,
-        _imageFileController);
+        _imageFileController, _audioFileController);
     Navigator.of(context)
         .pop(); // Close the Add Task screen after adding the task
   }
@@ -460,7 +481,6 @@ Future<File?> _pickImage() async {
   }
   return null;
 }
-
 
 /*add pick from tuqa
 Future<void> _pickImage(BuildContext context) async {
@@ -501,7 +521,6 @@ Future<void> _pickImage(BuildContext context) async {
 }
 
 */
-
 
 class ColorCircle extends StatelessWidget {
   final Color color;

@@ -120,7 +120,7 @@ class _CreateChildUserState extends State<CreateChildUser> {
                                 filled: true,
                                 prefixIcon: Icon(Icons.password),
                                 labelText:
-                                    'الرمز السري (at least 6 characters)',
+                                    'الرمز السري (إدخال 6 رموز على الأقل)',
                                 fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -262,12 +262,14 @@ class _CreateChildUserState extends State<CreateChildUser> {
                     ),
                     //back button
                     IconButton(
-                      onPressed: () {
-                        context.goNamed(PreLogin
-                            .routeName); // .then: ino sho ye3mal after logout
-                      },
-                      icon: const Icon(Icons.arrow_back),
-                    ),
+                  onPressed: () {
+                    context.goNamed(
+                        PreLogin.routeName); // .then: ino sho ye3mal after logout
+                  },
+                  icon: const Icon(Icons.arrow_circle_right_outlined,
+                  size: 60,
+                  color: Color.fromARGB(255, 148, 148, 148),),
+                                )
                   ],
                 ),
               ],
@@ -313,17 +315,24 @@ class _CreateChildUserState extends State<CreateChildUser> {
               await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass);
           // adding new child user in user collection
           usern = userCredential.user;
-          user newuserchild =
-              user(email: email, name: "name", accountType: "c", ucode: ucode);
-          DbHelper.addChilduserDb(newuserchild, usern!.uid);
+          // user newuserchild =
+          //     user(email: email, name: "name", accountType: "c", ucode: ucode);
+          // DbHelper.addChilduserDb(newuserchild, usern!.uid);
 
           //need to update ucode
-          DbHelper.updateUcode(ucode, usern.uid);
+          DbHelper.updateUcode(ucode, usern!.uid);
 
           //retriving child profile
           Child getchild =
               await childAuth().getChildWithSpecificUcode(ucode) as Child;
           currentChild = getchild;
+
+         user newuserchild =
+              user(email: email, name: currentChild!.name, accountType: "c", ucode: ucode);
+          DbHelper.addChilduserDb(newuserchild, usern.uid);
+
+
+          
           context.goNamed(HomeChild.routeName);
 
           EasyLoading.dismiss();

@@ -8,6 +8,7 @@ import 'package:jadwali_test_1/pages/Child/connect_monitor.dart';
 import 'package:jadwali_test_1/pages/Child/profile.dart';
 import 'package:jadwali_test_1/pages/Child/task_page.dart';
 import 'package:jadwali_test_1/pages/Common/pre_login.dart';
+import 'package:jadwali_test_1/providers/BLConn_provider.dart';
 import 'package:jadwali_test_1/providers/Schedule_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -22,10 +23,19 @@ class HomeChild extends StatefulWidget {
 }
 
 class _HomeChildState extends State<HomeChild> {
+
+
+    @override
+   initState() {
+    super.initState();
+  //Provider.of<BLConnProvider>(context, listen: false).clearDeviceAddress();
+  Provider.of<BLConnProvider>(context, listen: false).reconnectToDevice();
+  }
   @override
   void didChangeDependencies() {
     Provider.of<ScheduleProvider>(context, listen: false)
         .getTasksOfTheDay(widget.user.scheduleID);
+        
     super.didChangeDependencies();
   }
 

@@ -27,7 +27,7 @@ class Child {
   late int age; // late: will be initialized later
   final String gender;
   String? ucode;
-  String? braceletId;
+ // String? braceletId;
   late int threshold;
   late String? parentID;
   final String scheduleID;

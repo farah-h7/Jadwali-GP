@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:jadwali_test_1/db/dbSchedule_helper.dart';
 import 'package:jadwali_test_1/modules/Task.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ScheduleProvider with ChangeNotifier {
   List<STask> taskList = [];
@@ -18,7 +19,8 @@ class ScheduleProvider with ChangeNotifier {
       String repetition,
       Color color,
       String scheduleid,
-      File? TaskImage) async {
+      File? TaskImage,
+      File? TaskAudio) async {
     // Timestamp TSdob = Timestamp.fromDate(dob);
 
     final newTask = STask(
@@ -27,7 +29,7 @@ class ScheduleProvider with ChangeNotifier {
         endTime: endTime,
         repetition: repetition,
         color: color);
-    DbScheduleHelper.addTaskDb(newTask, scheduleid, TaskImage);
+    DbScheduleHelper.addTaskDb(newTask, scheduleid, TaskImage, TaskAudio);
 
     return notifyListeners();
   }
@@ -99,7 +101,35 @@ class ScheduleProvider with ChangeNotifier {
         }
       }
 
+      for (STask task in tasksOfTheDayList) {
+        if (task.audioURL != null) {
+          String url = task.audioURL!;
+          task.audioFile = await DbScheduleHelper.getAudioFile(url, task.id!);
+          //task.localAudioPath?.writeAsBytes(await task.audioFile!.readAsBytes());
+          
+
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String localFilePath = '${appDocDir.path}/temp.m4a'; // Provide a desired local file name
+      
+      await task.audioFile!.copy(localFilePath);
+
+      task.localAudioPath = localFilePath;
+      // task.localAudioPath = task.audioFile!.path;
+      
+      // task.localAudioPath = File(localFilePath);
+      // await task.localAudioPath!.writeAsBytes(await  task.audioFile!.readAsBytes());
+      
+
+      // Directory appDocDir = await getApplicationDocumentsDirectory();
+      // String _localFilePath = '${appDocDir.path}/$url';
+      
+      // File task.localAudioPath = File(_localFilePath);
+      // if (!task.localAudioPath.existsSync()) {
+      //   await .writeToFile(audioFile);
+      //   }
+      }
+
       notifyListeners();
-    });
+    }});
   }
 }

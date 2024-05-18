@@ -20,7 +20,7 @@ class DbScheduleHelper {
      return doc.id; 
   }
   
-  static Future<void> addTaskDb(STask newTask, String schedule_id, File? TaskImage) async {
+  static Future<void> addTaskDb(STask newTask, String schedule_id, File? TaskImage, File? TaskAudio,) async {
 
     final scheduleDocRef = _db.collection(collectionSchedule).doc(schedule_id);
     final tasksDocRef = scheduleDocRef.collection(collectionTasks).doc();// creating a subcollection tasks and adding a document to it 
@@ -41,6 +41,41 @@ class DbScheduleHelper {
       print("Error: $e");
     }
   }
+
+  // if (TaskAudio != null) {
+  //   // Upload to Firebase Storage
+  //   try {
+  //     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  //     Reference ref = FirebaseStorage.instance.ref().child('uploads/audio/$fileName');
+  //     UploadTask uploadTask = ref.putFile(TaskAudio);
+  //     TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+  //     String downloadURL = await snapshot.ref.getDownloadURL();
+  //     newTask.audioURL = downloadURL;
+
+  //   } catch (e) {
+  //     print("Error: $e");
+  //   }
+  // }
+  if (TaskAudio != null) {
+    // Upload to Firebase Storage
+    try {
+        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        Reference ref = FirebaseStorage.instance.ref().child('uploads/audio/$fileName');
+
+        // Create custom metadata to specify the content type
+        SettableMetadata metadata = SettableMetadata(
+            contentType: 'audio/m4a'  // Change according to your file type, 'audio/mpeg' for mp3, 'audio/wav' for wav files, etc.
+        );
+
+        UploadTask uploadTask = ref.putFile(TaskAudio, metadata);
+        TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+        String downloadURL = await snapshot.ref.getDownloadURL();
+        newTask.audioURL = downloadURL;
+
+    } catch (e) {
+        print("Error: $e");
+    }
+}
 
     return tasksDocRef.set(newTask.toMap());
   }
@@ -74,6 +109,17 @@ static Future<File> getImageFile(String imageUrl, String id) async {
     return file;
 }
 
+
+static Future<File> getAudioFile(String audioUrl, String id) async {
+  
+
+  final tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/$id.m4a';
+    final response = await http.get(Uri.parse(audioUrl));
+    final file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
+}
   //   static Stream<QuerySnapshot<Map<String, dynamic>>>
   //     getTasksOfTheDay(String schedule_id) {
 
