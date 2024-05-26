@@ -136,23 +136,23 @@ class _HomeParentState extends State<HomeParent> {
                                       ],
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      // Remove the item from the data source
-                                      setState(() {
-                                        //children.removeAt(index);
-                                      });
+                                  // IconButton(
+                                  //   icon: const Icon(Icons.delete),
+                                  //   onPressed: () {
+                                  //     // Remove the item from the data source
+                                  //     setState(() {
+                                  //       //children.removeAt(index);
+                                  //     });
 
-                                      // Show a snackbar to indicate item deletion
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text("تم الحذف"),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  //     // Show a snackbar to indicate item deletion
+                                  //     ScaffoldMessenger.of(context)
+                                  //         .showSnackBar(
+                                  //       const SnackBar(
+                                  //         content: Text("تم الحذف"),
+                                  //       ),
+                                  //     );
+                                  //   },
+                                  // ),
                                 ],
                               ),
                             ),

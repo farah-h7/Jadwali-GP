@@ -248,7 +248,7 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MyChartPage(),
+                        builder: (context) =>  MyChartPage(childInfo: widget.childInfo,),
                       ),
                     );
                   },
@@ -326,13 +326,14 @@ class _ChildSchedulePageState extends State<ChildSchedulePage> {
 String _getArabicDate() {
   final DateTime now = DateTime.now();
   final List<String> arabicDays = [
-    'الأحد',
+    
     'الاثنين',
     'الثلاثاء',
     'الأربعاء',
     'الخميس',
     'الجمعة',
-    'السبت'
+    'السبت',
+    'الأحد',
   ];
   final List<String> arabicMonths = [
     'كانون الثاني',
@@ -348,5 +349,5 @@ String _getArabicDate() {
     'تشرين الثاني',
     'كانون الأول'
   ];
-  return '${arabicDays[now.weekday]}- ${arabicMonths[now.month - 1]}';
+  return '${arabicDays[now.weekday-1]}- ${arabicMonths[now.month - 1]}';
 }

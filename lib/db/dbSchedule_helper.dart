@@ -100,15 +100,31 @@ class DbScheduleHelper {
 
 static Future<File> getImageFile(String imageUrl, String id) async {
   
-
-  final tempDir = await getTemporaryDirectory();
+  
+    final tempDir = await getApplicationDocumentsDirectory();
+      var directory = Directory('${tempDir.path}/$id.jpg');
+      bool directoryExists = await directory.exists();
+    if(!directoryExists){
+  //final tempDir = await getTemporaryDirectory();
     final filePath = '${tempDir.path}/$id.jpg';
     final response = await http.get(Uri.parse(imageUrl));
     final file = File(filePath);
     await file.writeAsBytes(response.bodyBytes);
     return file;
 }
+else {
+  final file = File('${tempDir.path}/$id.jpg');
+    //await file.writeAsBytes(response.bodyBytes);
+    return file;
 
+}
+  // final tempDir = await getTemporaryDirectory();
+  //   final filePath = '${tempDir.path}/$id.jpg';
+  //   final response = await http.get(Uri.parse(imageUrl));
+  //   final file = File(filePath);
+  //   await file.writeAsBytes(response.bodyBytes);
+  //   return file;
+}
 
 static Future<File> getAudioFile(String audioUrl, String id) async {
   

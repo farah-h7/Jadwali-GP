@@ -95,6 +95,7 @@ flutter:
      - assets/audios/audio2.m4a
      - assets/images/good-job.gif
      - assets/images/background3.png
+     - assets/images/hour-glass.gif
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

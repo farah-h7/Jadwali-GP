@@ -92,7 +92,7 @@ class ChildInformationPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const MyChartPage(),
+                        builder: (context) =>  MyChartPage(childInfo: child,),
                       ),
                     );
                   },

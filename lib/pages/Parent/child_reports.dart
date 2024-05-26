@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
-import 'package:flutter/cupertino.dart'; // To use Cupertino icons
+import 'package:flutter/cupertino.dart';
+import 'package:jadwali_test_1/modules/child.dart';
+import 'package:jadwali_test_1/pages/Parent/child_info.dart';
+import 'package:jadwali_test_1/pages/Parent/child_schedule.dart'; // To use Cupertino icons
 
 Color themeColor = const Color(0xFFFFF9E3);
 
 class MyChartPage extends StatefulWidget {
   static const String routeName = '/task_reports';
-
-  const MyChartPage({super.key});
+  final Child childInfo;
+  const MyChartPage({super.key, required this.childInfo});
 
   @override
   _MyChartPageState createState() => _MyChartPageState();
@@ -75,12 +78,14 @@ class _MyChartPageState extends State<MyChartPage> {
             ],
           ),
         ),
+////////////////////////////navigation bar //////////////////////////////
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromRGBO(255, 249, 227, 1),
-              borderRadius: BorderRadius.circular(15.0),
+              color:
+                  const Color.fromRGBO(255, 249, 227, 100), // Background color
+              borderRadius: BorderRadius.circular(15.0), // Border radius
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
@@ -88,19 +93,64 @@ class _MyChartPageState extends State<MyChartPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.calendar_today_outlined),
-                  onPressed: () {},
+                  
+                  onPressed: () {
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChildSchedulePage(
+                          childInfo: widget.childInfo,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.analytics_outlined),
-                  onPressed: () {},
+                  //isSelected: true,
+                  onPressed: () {
+                    // Navigate to page 2
+    
+                  },
+                ),
+            
+                GestureDetector(//logo, home 
+                  onTap: () {
+                    Navigator.pop(context);
+                    //context.goNamed(HomeParent.routeName);
+                    // Navigate to page 3
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Button border radius
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo5.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.person),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChildInformationPage(
+                          child: widget.childInfo,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Navigate to page 5
+                  },
                 ),
               ],
             ),
@@ -434,7 +484,7 @@ class CustomCircularIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(50, 50), // Size of the circle
+      size: const Size(45, 45), // Size of the circle
       painter: _CircleProgressPainter(progress, maxProgress),
     );
   }
@@ -699,11 +749,11 @@ class LineChartReport extends StatelessWidget {
                         ' مهمة ${index + 1} ',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 17,
                         ),
                       ),
                       subtitle: Text(
-                          ' عدد مرات التوتر في هذه المهمة  $progress  من 7 ايام'),
+                          ' عدد مرات التوتر:      $progress من 7 ايام'),
                       trailing: CustomCircularIndicator(progress: progress),
                     ),
                   );

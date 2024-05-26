@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 
 List<STask> playTasksglobal = [];
 int index = 0;
-late STask currentTask;
+late STask? currentTask;
 bool currentlyStressed = false;
 
 ///variables for heart rate monitoring
@@ -36,7 +36,7 @@ StreamSubscription<Uint8List>? _dataSubscription;
 ///variables for pop ups
 //bool isStressed = false; // Indicates if the child is stressed
 final audioPlayer = AudioPlayer();
-bool isButtonEnabled = false; // Initially disabled
+//bool isButtonEnabled = false; // Initially disabled
 
 //connection!.input!.listen(onDataReceived)
 
@@ -50,14 +50,20 @@ class TaskDisplayPage extends StatefulWidget {
 }
 
 class _TaskDisplayPageState extends State<TaskDisplayPage> {
+  Timer? countdownTimer;
+  String countdown = "Loading...";
+  bool showCountdown = false; // Control visibility of the countdown
+  bool isButtonEnabled = false;
+  bool dis = false;
+
   ///////////////////////////methods///////////////////////////
 
   void onDataReceived(Uint8List data) {
     // Accumulate data until delimiter is found
     for (int i = 0; i < data.length; i++) {
       if (data[i] == 44) {
+        // ASCII value for ','
         setState(() {
-          // ASCII value for ','
           pulseData = String.fromCharCodes(buffer);
           int heartRate = int.tryParse(pulseData) ?? 0;
           if (heartRate > threshold) {
@@ -83,21 +89,22 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     if (lastTimeAboveThreshold != null) {
       Duration timeSinceLastAbove =
           DateTime.now().difference(lastTimeAboveThreshold!);
-      if (timeSinceLastAbove <= maxGap /*Duration(seconds: 1)*/) {
+      if (timeSinceLastAbove <= maxGap) {
         aboveThresholdDuration += const Duration(seconds: 1);
       } else {
         aboveThresholdDuration = Duration.zero;
-        //new//
         lastTimeAboveThreshold = null; // Reset tracking after significant pause
       }
-
       if (aboveThresholdDuration >= const Duration(minutes: 1)) {
         if (!currentlyStressed) {
-          //if child was not stressed, show popup
+          //if child was not already in a stressed state, show popup
           currentlyStressed = true;
-          showStressPopUp(context, currentTask.id!, Timestamp.now());
+          if (currentTask == null) {
+            showStressPopUp(context, "", Timestamp.now());
+          } else {
+            showStressPopUp(context, currentTask!.id!, Timestamp.now());
+          }
         } else {
-          // if child
           aboveThresholdDuration = Duration.zero;
         }
       }
@@ -142,12 +149,71 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     _dataSubscription = null;
   }
 
+  // void startTaskTimer() {
+  //   Timer(const Duration(seconds: 5 /*minutes: 2*/), () {
+  //     setState(() {
+  //       isButtonEnabled = true; // Enable the button after 2 minutes
+  //     });
+  //   });
+  // }
+
   void startTaskTimer() {
-    Timer(const Duration(seconds: 5 /*minutes: 2*/), () {
-      setState(() {
-        isButtonEnabled = true; // Enable the button after 2 minutes
-      });
+    countdownTimer?.cancel(); // Cancel any existing timer
+    dis = false; // Disable the button when task timer starts
+    setState(() {}); // Update the UI to reflect the button disabled state
+
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      DateTime now = DateTime.now();
+
+      if (index < widget.playTasks.length) {
+        DateTime taskDateTime = widget.playTasks[index].startTime;
+        TimeOfDay taskTime = TimeOfDay(hour: taskDateTime.hour, minute: taskDateTime.minute);
+        TimeOfDay nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
+
+        int taskTotalMinutes = taskTime.hour * 60 + taskTime.minute;
+        int nowTotalMinutes = nowTime.hour * 60 + nowTime.minute;
+
+        if (taskTotalMinutes > nowTotalMinutes) {
+          int diffMinutes = taskTotalMinutes - nowTotalMinutes;
+          int hours = diffMinutes ~/ 60;
+          int minutes = diffMinutes % 60;
+          int seconds = 60 - now.second;
+
+          Duration timeLeft = Duration(hours: hours, minutes: minutes - 1, seconds: seconds);
+          setState(() {
+            countdown = formatDuration(timeLeft);
+            isButtonEnabled = false;
+            showCountdown = true;
+            currentTask = null;
+          });
+        } else {
+          setState(() {
+            countdown = "Task started!";
+            isButtonEnabled = true;
+            showCountdown = false;
+            currentTask = widget.playTasks[index];
+            Future.delayed(const Duration(seconds: 10), () {
+              // Re-enable the button after 10 seconds for this specific task
+              if (mounted) {
+                setState(() {
+                  
+                  dis = true;
+                });
+              }
+            });
+          });
+          timer.cancel(); // Stop the countdown timer
+        }
+      } else {
+        print(
+            "Index out of range: Index - $index, Tasks Length - ${widget.playTasks.length}");
+        timer.cancel(); // Stop the countdown timer
+      }
     });
+  }
+
+  String formatDuration(Duration d) {
+    return '${d.inHours.toString().padLeft(2, '0')}:${(d.inMinutes % 60).toString().padLeft(2, '0')}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -155,6 +221,8 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     //what happens after closing the page
     stopListening();
     checkTimer?.cancel();
+    countdownTimer?.cancel();
+
     stressTimer?.cancel();
     super.dispose();
   }
@@ -162,6 +230,7 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
   @override
   void initState() {
     super.initState();
+    isButtonEnabled = false; // Ensure button is initially disabled
 
     if (index == 0 &&
         Provider.of<BLConnProvider>(context, listen: false).isConn) {
@@ -169,19 +238,26 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     }
     if (index == 0) {
       currentTask = widget.playTasks[index];
-
-      startTaskTimer();
     }
 
-    // stressTimer = Timer.periodic(const Duration(minutes: 2),
-    //     (_) => showStressPopUp(context, "id", Timestamp.now()));
+    Future.delayed(const Duration(seconds: 10), () {
+      if (mounted) {
+        setState(() {
+          dis = true; // Enable button after 10 seconds
+        });
+      }
+    });
+    startTaskTimer();
+
+    stressTimer = Timer.periodic(const Duration(seconds: 10),
+        (_) => showStressPopUp(context, "id", Timestamp.now()));
 
     checkTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => checkForStress());
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -199,7 +275,43 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
                 CrossAxisAlignment.center, // Horizontal Alignment
             mainAxisAlignment: MainAxisAlignment.center, // Vertical Alignment
 
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+
+              if (showCountdown) ...[
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          spreadRadius: 3,
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                      "الوقت المتبقي للمهمة التالية :",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black ),
+                    ),
+                    Text(
+                      countdown,
+                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.blue),
+                    ),
+
+                      Image.asset('assets/images/hour-glass.gif'),
+
+                      ],
+                    ),
+                  ),
+                ),
+              ] else if (isButtonEnabled) ...[
               const SizedBox(
                 height: 40,
               ),
@@ -246,11 +358,8 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          //await AudioPlayer().play(AssetSource(widget.playTasks[index].localAudioPath!));
-                          //await   AudioPlayer().play(widget.playTasks[index].localAudioPath!);
-
-                          // await audioPlayer
-                          //     .play( widget.playTasks[index].audioFile!/*AssetSource('audios/audio1.m4a')*/);
+                          await audioPlayer
+                              .play(AssetSource('audios/audio1.m4a'));
                         },
                         child: const Icon(
                           Icons.volume_up_rounded,
@@ -275,25 +384,23 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
               IconButton(
                 iconSize: 100,
                 icon: Icon(Icons.check_circle,
-                    color: isButtonEnabled ? Colors.green : Colors.grey),
+                    color: dis ? Colors.green : Colors.grey),
                 onPressed: () {
-                  if (isButtonEnabled) {
+                  if (dis) {
                     showCongratulationsPopUp(context);
-            
 
                     // Check if there are more tasks
                     if (index < widget.playTasks.length - 1) {
-
+                      //showCongratulationsPopUp(context);
                       // Move to the next task
                       setState(() {
                         index++;
-                        currentTask = widget.playTasks[index];
                         isButtonEnabled = false;
-                        Timer(const Duration(seconds: 3), () {
-                          startTaskTimer();
-                        });
+                        
+                        startTaskTimer();
+                       
                       });
-                    } else {//last task 
+                    } else {
                       showCongratulationsPopUp(context);
 
                       index = 0;
@@ -303,26 +410,8 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
                   }
                 },
               ),
-
-              ///////////////heart rate info
-              // Column(
-              //   children: [
-              //     Text('Latest Pulse Value: $pulseData',
-              //         style: const TextStyle(fontSize: 10)),
-              //     Text('LastTimrAbouveThreshold: $lastTimeAboveThreshold',
-              //         style: const TextStyle(fontSize: 10)),
-              //     Text('aboveThresholdDuration: $aboveThresholdDuration',
-              //         style: const TextStyle(fontSize: 10)),
-              //     Text('teleranceCounter: $toleranceCounter',
-              //         style: const TextStyle(fontSize: 10)),
-              //     const Text('toleranceLimit: $toleranceLimit',
-              //         style: TextStyle(fontSize: 10)),
-              //     Text('Latest Pulse Value: $pulseData',
-              //         style: const TextStyle(fontSize: 10)),
-              //   ],
-              // ),
             ],
-          ),
+         ] ),
         ]),
       ),
     );
