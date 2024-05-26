@@ -167,7 +167,8 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
 
       if (index < widget.playTasks.length) {
         DateTime taskDateTime = widget.playTasks[index].startTime;
-        TimeOfDay taskTime = TimeOfDay(hour: taskDateTime.hour, minute: taskDateTime.minute);
+        TimeOfDay taskTime =
+            TimeOfDay(hour: taskDateTime.hour, minute: taskDateTime.minute);
         TimeOfDay nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
 
         int taskTotalMinutes = taskTime.hour * 60 + taskTime.minute;
@@ -179,7 +180,8 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
           int minutes = diffMinutes % 60;
           int seconds = 60 - now.second;
 
-          Duration timeLeft = Duration(hours: hours, minutes: minutes - 1, seconds: seconds);
+          Duration timeLeft =
+              Duration(hours: hours, minutes: minutes - 1, seconds: seconds);
           setState(() {
             countdown = formatDuration(timeLeft);
             isButtonEnabled = false;
@@ -196,7 +198,6 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
               // Re-enable the button after 10 seconds for this specific task
               if (mounted) {
                 setState(() {
-                  
                   dis = true;
                 });
               }
@@ -249,15 +250,15 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
     });
     startTaskTimer();
 
-    stressTimer = Timer.periodic(const Duration(seconds: 10),
-        (_) => showStressPopUp(context, "id", Timestamp.now()));
+    // stressTimer = Timer.periodic(const Duration(seconds: 10),
+    //     (_) => showStressPopUp(context, "id", Timestamp.now()));
 
     checkTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => checkForStress());
   }
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -271,147 +272,157 @@ class _TaskDisplayPageState extends State<TaskDisplayPage> {
             ),
           ),
           Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Horizontal Alignment
-            mainAxisAlignment: MainAxisAlignment.center, // Vertical Alignment
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // Horizontal Alignment
+              mainAxisAlignment: MainAxisAlignment.center, // Vertical Alignment
 
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-
-              if (showCountdown) ...[
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          spreadRadius: 3,
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        const Text(
-                      "الوقت المتبقي للمهمة التالية :",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black ),
-                    ),
-                    Text(
-                      countdown,
-                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.blue),
-                    ),
-
-                      Image.asset('assets/images/hour-glass.gif'),
-
-                      ],
-                    ),
-                  ),
-                ),
-              ] else if (isButtonEnabled) ...[
-              const SizedBox(
-                height: 40,
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.8),
-                        spreadRadius: 2,
-                        blurRadius: 7,
-                        offset: const Offset(0, 3),
+              // crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (showCountdown) ...[
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 40.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            spreadRadius: 3,
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      widget.playTasks[index].imageFile != null
-                          ? Image.file(
-                              widget.playTasks[index].imageFile!,
-                              width: 300,
-                              height: 300,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset('assets/images/logo.png',
-                              /*tasks[index].imagePath*/
-                              width: 200,
-                              height: 200),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Center(
-                          child: Text(
-                            widget.playTasks[index].name,
+                      child: Column(
+                        children: [
+                          const Text(
+                            "الوقت المتبقي للمهمة التالية :",
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          Text(
+                            countdown,
                             style: const TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          Image.asset('assets/images/hour-glass.gif'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ] else if (isButtonEnabled) ...[
+                  const SizedBox(
+                    height: 40,
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.8),
+                            spreadRadius: 2,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          widget.playTasks[index].imageFile != null
+                              ? Image.file(
+                                  widget.playTasks[index].imageFile!,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset('assets/images/logo.png',
+                                  /*tasks[index].imagePath*/
+                                  width: 200,
+                                  height: 200),
+
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Center(
+                              child: Text(
+                                widget.playTasks[index].name,
+                                style: const TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+/////////////////////////////////////////////////audio///////////////////
+widget.playTasks[index].localAudioPath != null?
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (widget.playTasks[index].audioFile != null) {
+                                await audioPlayer.play(DeviceFileSource(
+                                    widget.playTasks[index].localAudioPath!));
+                              }
+                            },
+                            child: const Icon(
+                              Icons.volume_up_rounded,
+                              size: 50,
+                            ),
+                          ): const SizedBox(
+                            height: 20,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          )
+                        ],
                       ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await audioPlayer
-                              .play(AssetSource('audios/audio1.m4a'));
-                        },
-                        child: const Icon(
-                          Icons.volume_up_rounded,
-                          size: 50,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      )
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              // if (task.audioPath != null) ...[
-              //   // Display audio player if audio path is provided
-              //   // Implement audio player widget here
-              //   // Placeholder for now
-              //   SizedBox(height: 20),
-              //   Center(child: Text('Audio Player Placeholder')),
-              // ],
-              const SizedBox(height: 50),
-              IconButton(
-                iconSize: 100,
-                icon: Icon(Icons.check_circle,
-                    color: dis ? Colors.green : Colors.grey),
-                onPressed: () {
-                  if (dis) {
-                    showCongratulationsPopUp(context);
+                  // if (task.audioPath != null) ...[
+                  //   // Display audio player if audio path is provided
+                  //   // Implement audio player widget here
+                  //   // Placeholder for now
+                  //   SizedBox(height: 20),
+                  //   Center(child: Text('Audio Player Placeholder')),
+                  // ],
+                  const SizedBox(height: 50),
+                  IconButton(
+                    iconSize: 100,
+                    icon: Icon(Icons.check_circle,
+                        color: dis ? Colors.green : Colors.grey),
+                    onPressed: () {
+                      if (dis) {
+                        showCongratulationsPopUp(context);
 
-                    // Check if there are more tasks
-                    if (index < widget.playTasks.length - 1) {
-                      //showCongratulationsPopUp(context);
-                      // Move to the next task
-                      setState(() {
-                        index++;
-                        isButtonEnabled = false;
-                        
-                        startTaskTimer();
-                       
-                      });
-                    } else {
-                      showCongratulationsPopUp(context);
+                        // Check if there are more tasks
+                        if (index < widget.playTasks.length - 1) {
+                          //showCongratulationsPopUp(context);
+                          // Move to the next task
+                          setState(() {
+                            index++;
+                            isButtonEnabled = false;
 
-                      index = 0;
-                      // No more tasks, navigate back
-                      Navigator.pop(context);
-                    }
-                  }
-                },
-              ),
-            ],
-         ] ),
+                            startTaskTimer();
+                          });
+                        } else {
+                          showCongratulationsPopUp(context);
+
+                          index = 0;
+                          // No more tasks, navigate back
+                          Navigator.pop(context);
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ]),
         ]),
       ),
     );

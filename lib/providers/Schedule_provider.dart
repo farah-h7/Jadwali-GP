@@ -108,13 +108,13 @@ class ScheduleProvider with ChangeNotifier {
           //task.localAudioPath?.writeAsBytes(await task.audioFile!.readAsBytes());
           
 
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String localFilePath = '${appDocDir.path}/temp.m4a'; // Provide a desired local file name
+      //Directory appDocDir = await getApplicationDocumentsDirectory();
+      //String localFilePath = '${appDocDir.path}/temp.m4a'; // Provide a desired local file name
       
-      await task.audioFile!.copy(localFilePath);
+     // await task.audioFile!.copy(localFilePath);
 
-      task.localAudioPath = localFilePath;
-      // task.localAudioPath = task.audioFile!.path;
+      //task.localAudioPath = localFilePath;
+       task.localAudioPath = task.audioFile!.path;
       
       // task.localAudioPath = File(localFilePath);
       // await task.localAudioPath!.writeAsBytes(await  task.audioFile!.readAsBytes());
